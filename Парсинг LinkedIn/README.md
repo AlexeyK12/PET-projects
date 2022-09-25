@@ -1,6 +1,6 @@
-# LinkedIn
+# Парсинг LinkedIn
 
-## Парсинг LinkedIn с помощью requests и BeautifulSoup, создав следующие признаки:
+## Обработка данных html с помощью requests и BeautifulSoup, создав следующие признаки:
 - наименование вакансии
 - город
 - страна
