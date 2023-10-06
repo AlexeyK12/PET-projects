@@ -96,3 +96,35 @@ catboost_trainer = CatBoostModelTrainer(n_estimators, learning_rate, depth, rsm,
 
 # обучение и оценка модели
 catboost_trainer.train_evaluate(X_train, X_test, y_train, y_test)
+
+# датафрейм важности признаков
+feature_importance = catboost_trainer.model.named_steps['forecast'].feature_importances_
+categorical_features = (catboost_trainer.model.named_steps['preprocessor'].transformers_[1][1].named_steps['onehot'].
+                        get_feature_names_out(input_features=categorical_columns))
+feature_names = np.concatenate([X_train.select_dtypes(include=[np.number]).columns, categorical_features])
+feature_importance_df = pd.DataFrame({'Feature': feature_names, 'Importance': feature_importance})
+feature_importance_df_sorted = feature_importance_df.sort_values(by='Importance', ascending=False).head(10)
+
+# дашборд
+fig = px.bar(feature_importance_df_sorted.sort_values(by='Importance', ascending=True),
+             x='Importance',
+             y='Feature',
+             orientation='h',
+             title='ТОП-10 важности признаков',
+             labels={'Importance': 'Влияние', 'Feature': 'Фича'},
+             color='Importance',
+             color_continuous_scale='Viridis')
+
+fig.update_layout(
+    paper_bgcolor='#0000FF',  
+    plot_bgcolor='#0000FF',  
+    font_color='#1e1e1e',  
+    title_font_size=30,
+    title_font_color='#2ecc71',
+    title_x=0.23
+)
+
+fig.update_xaxes(showgrid=True, gridcolor='#1e1e1e')  
+fig.update_yaxes(showgrid=True, gridcolor='#1e1e1e')  
+
+st.plotly_chart(fig)
